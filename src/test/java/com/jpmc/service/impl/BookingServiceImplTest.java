@@ -1,6 +1,7 @@
 package com.jpmc.service.impl;
 
 import com.jpmc.command.BookCommand;
+import com.jpmc.command.CancelCommand;
 import com.jpmc.command.FindAvailabilityCommand;
 import com.jpmc.dao.AvailableSeatDAO;
 import com.jpmc.dao.BookingDAO;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -128,7 +130,110 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void testCancelTicket() {
-        
+    void testCancelTicket_ticketNoFound_throwsBex() {
+
+        String ticketNo = "1";
+        String phoneNo = "123";
+        CancelCommand command = Mockito.mock(CancelCommand.class);
+        Mockito.when(command.getTicketNo()).thenReturn(ticketNo);
+        Mockito.when(command.getPhoneNo()).thenReturn(phoneNo);
+
+        Mockito.when(bookingDAO.findByTicketNo(ticketNo))
+                .thenReturn(Optional.empty());
+
+        BusinessException bex = Assertions.assertThrows(BusinessException.class, () -> bookingService.cancelTicket(command));
+        Assertions.assertEquals("Ticket Not Found", bex.getMessage());
     }
+
+    @Test
+    void testCancelTicket_unmatchedPhoneNo_throwsBex() {
+
+        String ticketNo = "1";
+        String phoneNo = "123";
+        String differentPhoneNo = "321";
+        CancelCommand command = Mockito.mock(CancelCommand.class);
+        Mockito.when(command.getTicketNo()).thenReturn(ticketNo);
+        Mockito.when(command.getPhoneNo()).thenReturn(phoneNo);
+
+        Booking booking = Mockito.mock(Booking.class);
+        Mockito.when(booking.getPhoneNo()).thenReturn(differentPhoneNo);
+
+        Mockito.when(bookingDAO.findByTicketNo(ticketNo))
+                .thenReturn(Optional.of(booking));
+
+        BusinessException bex = Assertions.assertThrows(BusinessException.class, () -> bookingService.cancelTicket(command));
+        Assertions.assertEquals("Unauthorized", bex.getMessage());
+    }
+
+    @Test
+    void testCancelTicket_exceedingCancellationWindow_throwsBex() {
+
+        String ticketNo = "1";
+        String phoneNo = "123";
+        String showNo = "1";
+
+        int cancellationWindow = 10;
+
+        CancelCommand command = Mockito.mock(CancelCommand.class);
+        Mockito.when(command.getTicketNo()).thenReturn(ticketNo);
+        Mockito.when(command.getPhoneNo()).thenReturn(phoneNo);
+
+        Booking booking = Mockito.mock(Booking.class);
+        Mockito.when(booking.getPhoneNo()).thenReturn(phoneNo);
+        Mockito.when(booking.getShowNo()).thenReturn(showNo);
+        Mockito.when(booking.getDateTime()).thenReturn(
+                LocalDateTime.now().minusMinutes(cancellationWindow)
+        );
+
+        Show show = Mockito.mock(Show.class);
+        Mockito.when(show.getCancellationWindowInMinutes()).thenReturn(cancellationWindow);
+
+        Mockito.when(bookingDAO.findByTicketNo(ticketNo))
+                .thenReturn(Optional.of(booking));
+
+        Mockito.when(showDAO.findByShowNo(showNo))
+                .thenReturn(Optional.of(show));
+
+        BusinessException bex = Assertions.assertThrows(BusinessException.class, () -> bookingService.cancelTicket(command));
+        Assertions.assertEquals("Exceeding Cancellation Window of 10 minute(s), Unable to Cancel ticket", bex.getMessage());
+    }
+
+    @Test
+    void testCancelTicket() {
+
+        String ticketNo = "1";
+        String phoneNo = "123";
+        String showNo = "1";
+
+        int cancellationWindow = 10;
+
+        CancelCommand command = Mockito.mock(CancelCommand.class);
+        Mockito.when(command.getTicketNo()).thenReturn(ticketNo);
+        Mockito.when(command.getPhoneNo()).thenReturn(phoneNo);
+
+        Set<Seat> seats = Set.of(new Seat('A', 1));
+        Booking booking = Mockito.mock(Booking.class);
+        Mockito.when(booking.getPhoneNo()).thenReturn(phoneNo);
+        Mockito.when(booking.getShowNo()).thenReturn(showNo);
+        Mockito.when(booking.getDateTime()).thenReturn(LocalDateTime.now());
+        Mockito.when(booking.getSeats()).thenReturn(seats);
+
+        Show show = Mockito.mock(Show.class);
+        Mockito.when(show.getCancellationWindowInMinutes()).thenReturn(cancellationWindow);
+
+        Mockito.when(bookingDAO.findByTicketNo(ticketNo))
+                .thenReturn(Optional.of(booking));
+
+        Mockito.when(showDAO.findByShowNo(showNo))
+                .thenReturn(Optional.of(show));
+
+        bookingService.cancelTicket(command);
+
+        Mockito.verify(availableSeatDAO, Mockito.times(1)).addAvailableSeats(showNo, seats);
+
+        Booking cancelledBooking = booking.cancel();
+        Mockito.verify(bookingDAO, Mockito.times(1)).createOrUpdate(cancelledBooking);
+    }
+
+
 }
