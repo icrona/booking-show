@@ -101,7 +101,7 @@ class BookingDAOTest {
 
         Booking exisitingBooking = bookingDAO.createOrUpdate(booking);
         Assertions.assertEquals(1, bookingDAO.findByShowNo(showNo).size());
-        Booking cancelledBooking = bookingDAO.createOrUpdate(booking.cancel(exisitingBooking));
+        Booking cancelledBooking = bookingDAO.createOrUpdate(exisitingBooking.cancel());
         Assertions.assertEquals(0, bookingDAO.findByShowNo(showNo).size());
 
         Assertions.assertNotNull(cancelledBooking);

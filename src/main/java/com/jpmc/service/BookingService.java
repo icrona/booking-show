@@ -1,6 +1,7 @@
 package com.jpmc.service;
 
 import com.jpmc.command.BookCommand;
+import com.jpmc.command.CancelCommand;
 import com.jpmc.command.FindAvailabilityCommand;
 import com.jpmc.dto.AvailabilityDTO;
 
@@ -11,4 +12,6 @@ public interface BookingService extends Service {
     AvailabilityDTO findAvailability(FindAvailabilityCommand command);
 
     UUID bookShow(BookCommand bookCommand);
+
+    void cancelTicket(CancelCommand command);
 }

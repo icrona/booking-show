@@ -20,4 +20,8 @@ public class Show {
     public String getShowNo() {
         return showNo;
     }
+
+    public int getCancellationWindowInMinutes() {
+        return cancellationWindowInMinutes;
+    }
 }

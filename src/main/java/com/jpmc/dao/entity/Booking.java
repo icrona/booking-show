@@ -50,8 +50,8 @@ public class Booking {
                 bookingStatus);
     }
 
-    public Booking cancel(Booking booking) {
-        return new Booking(booking, BookingStatus.CANCELLED);
+    public Booking cancel() {
+        return new Booking(this, BookingStatus.CANCELLED);
     }
 
     public String getShowNo() {
@@ -72,5 +72,9 @@ public class Booking {
 
     public BookingStatus getBookingStatus() {
         return bookingStatus;
+    }
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
     }
 }
