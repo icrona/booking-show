@@ -17,7 +17,7 @@ public class DependencyInjection {
 
     private static final AvailableSeatDAO availableSeatDAO = new AvailableSeatDAOImpl();
 
-    private static final ShowService showService = new ShowServiceImpl(showDAO, availableSeatDAO);
+    private static final ShowService showService = new ShowServiceImpl(showDAO, availableSeatDAO, bookingDAO);
 
     private static final List<Service> SERVICES = List.of(showService);
 

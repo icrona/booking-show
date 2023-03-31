@@ -2,6 +2,7 @@ package com.jpmc.service;
 
 import com.jpmc.command.SetupCommand;
 import com.jpmc.dao.AvailableSeatDAO;
+import com.jpmc.dao.BookingDAO;
 import com.jpmc.dao.ShowDAO;
 import com.jpmc.dao.entity.Seat;
 import com.jpmc.dao.entity.Show;
@@ -25,13 +26,16 @@ class ShowServiceTest {
 
     private AvailableSeatDAO availableSeatDAO;
 
+    private BookingDAO bookingDAO;
+
     private ShowService showService;
 
     @BeforeEach
     public void setup() {
         showDAO = Mockito.mock(ShowDAO.class);
         availableSeatDAO = Mockito.mock(AvailableSeatDAO.class);
-        showService = new ShowServiceImpl(showDAO, availableSeatDAO);
+        bookingDAO = Mockito.mock(BookingDAO.class);
+        showService = new ShowServiceImpl(showDAO, availableSeatDAO, bookingDAO);
     }
 
     @Test

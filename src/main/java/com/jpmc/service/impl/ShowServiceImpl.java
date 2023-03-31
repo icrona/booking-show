@@ -1,14 +1,21 @@
 package com.jpmc.service.impl;
 
 import com.jpmc.command.SetupCommand;
+import com.jpmc.command.ViewCommand;
 import com.jpmc.dao.AvailableSeatDAO;
+import com.jpmc.dao.BookingDAO;
 import com.jpmc.dao.ShowDAO;
+import com.jpmc.dao.entity.Booking;
 import com.jpmc.dao.entity.Seat;
 import com.jpmc.dao.entity.Show;
+import com.jpmc.dto.ShowDTO;
 import com.jpmc.exception.BusinessException;
+import com.jpmc.mapper.ShowMapper;
 import com.jpmc.service.ShowService;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class ShowServiceImpl implements ShowService {
@@ -23,9 +30,12 @@ public class ShowServiceImpl implements ShowService {
 
     private final AvailableSeatDAO availableSeatDAO;
 
-    public ShowServiceImpl(ShowDAO showDAO, AvailableSeatDAO availableSeatDAO) {
+    private final BookingDAO bookingDAO;
+
+    public ShowServiceImpl(ShowDAO showDAO, AvailableSeatDAO availableSeatDAO, BookingDAO bookingDAO) {
         this.showDAO = showDAO;
         this.availableSeatDAO = availableSeatDAO;
+        this.bookingDAO = bookingDAO;
     }
 
     @Override
@@ -69,5 +79,14 @@ public class ShowServiceImpl implements ShowService {
             }
         }
         return seats;
+    }
+
+    @Override
+    public Optional<ShowDTO> view(ViewCommand viewCommand) {
+        Optional<Show> show = showDAO.findByShowNo(viewCommand.getShowNo());
+        if (show.isEmpty()) return Optional.empty();
+
+        List<Booking> bookings = bookingDAO.findByShowNo(viewCommand.getShowNo());
+        return Optional.of(ShowMapper.mapShow(show.get(), bookings));
     }
 }
