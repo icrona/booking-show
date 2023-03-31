@@ -16,6 +16,10 @@ public class FindAvailabilityCommand implements Command {
 
     @Override
     public String execute() {
-        return bookingService.findAvailability(showNo).toString();
+        return bookingService.findAvailability(this).toString();
+    }
+
+    public String getShowNo() {
+        return showNo;
     }
 }
