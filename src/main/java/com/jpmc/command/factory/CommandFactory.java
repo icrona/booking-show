@@ -7,10 +7,10 @@ import java.util.Arrays;
 
 public class CommandFactory {
 
-    private static final int ADMIN = 1;
-    private static final int BUYER = 2;
+    public static final int ADMIN = 1;
+    public static final int BUYER = 2;
 
-    public static Command getCommand(int user, String command) {
+    public static Command createCommand(int user, String command) {
         if (command.startsWith("Setup") && user == ADMIN) {
             command = command.replaceAll("Setup ", "");
             if(command.matches("\\w+\\s\\d+\\s\\d+\\s\\d+")) {

@@ -11,7 +11,7 @@ public class Main {
             System.out.println("Select User (1)Admin (2)Buyer : ");
             int user = new Scanner(System.in).nextInt();
 
-            if(user != 1 && user != 2) {
+            if(user != CommandFactory.ADMIN && user != CommandFactory.BUYER) {
                 System.out.println("Invalid user");
                 continue;
             }
@@ -19,7 +19,7 @@ public class Main {
             try {
                 System.out.println("Enter Command : ");
                 String command = new Scanner(System.in).nextLine();
-                String output = CommandFactory.getCommand(user, command).execute();
+                String output = CommandFactory.createCommand(user, command).execute();
                 System.out.println(output);
             }
             catch (BusinessException ex) {
