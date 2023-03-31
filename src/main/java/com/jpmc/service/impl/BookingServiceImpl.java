@@ -68,7 +68,7 @@ public class BookingServiceImpl implements BookingService {
 
         for(Seat seat: seats) {
             if(!availableSeat.contains(seat)) {
-                throw new BusinessException(String.format("Seat %s not available", seat.toString()));
+                throw new BusinessException(String.format("Seat %s is not available", seat.toString()));
             }
         }
 

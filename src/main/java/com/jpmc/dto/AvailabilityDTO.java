@@ -14,4 +14,8 @@ public class AvailabilityDTO {
     public String toString() {
         return seats.toString();
     }
+
+    public List<String> getSeats() {
+        return seats;
+    }
 }
