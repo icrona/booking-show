@@ -1,6 +1,7 @@
 package com.jpmc.dao.entity;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -63,6 +64,10 @@ public class Booking {
 
     public String getTicketNo() {
         return ticketNo;
+    }
+
+    public Set<Seat> getSeats() {
+        return Collections.unmodifiableSet(seats);
     }
 
     public BookingStatus getBookingStatus() {

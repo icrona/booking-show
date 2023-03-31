@@ -39,6 +39,19 @@ class BookingDAOTest {
     }
 
     @Test
+    void findByShowNo() {
+        String showNo = "1";
+        Booking booking = new Booking(
+                showNo,
+                "phoneNo",
+                "ticketNo",
+                Collections.singleton(new Seat('A', 1))
+        );
+        bookingDAO.createOrUpdate(booking);
+        Assertions.assertEquals(1, bookingDAO.findByShowNo(showNo).size());
+    }
+
+    @Test
     void findByShowNoAndPhoneNo_NotFound_returnsEmpty() {
 
         String showNo = "1";
@@ -78,15 +91,18 @@ class BookingDAOTest {
     @Test
     void createOrUpdate_cancelBooking() {
 
+        String showNo = "showNo";
         Booking booking = new Booking(
-                "showNo",
+                showNo,
                 "phoneNo",
                 "ticketNo",
                 Collections.singleton(new Seat('A', 1))
         );
 
         Booking exisitingBooking = bookingDAO.createOrUpdate(booking);
+        Assertions.assertEquals(1, bookingDAO.findByShowNo(showNo).size());
         Booking cancelledBooking = bookingDAO.createOrUpdate(booking.cancel(exisitingBooking));
+        Assertions.assertEquals(0, bookingDAO.findByShowNo(showNo).size());
 
         Assertions.assertNotNull(cancelledBooking);
         Assertions.assertEquals(Booking.BookingStatus.ACTIVE, exisitingBooking.getBookingStatus());
