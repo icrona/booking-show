@@ -9,4 +9,9 @@ public class AvailabilityDTO {
     public AvailabilityDTO(List<String> seats) {
         this.seats = seats;
     }
+
+    @Override
+    public String toString() {
+        return seats.toString();
+    }
 }

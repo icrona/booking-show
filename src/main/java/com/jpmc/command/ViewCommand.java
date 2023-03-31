@@ -23,7 +23,7 @@ public class ViewCommand implements Command {
         if(showDTO.isEmpty()) {
             return "Show Not Found";
         }
-        return showDTO.toString();
+        return showDTO.get().toString();
     }
 
     public String getShowNo() {

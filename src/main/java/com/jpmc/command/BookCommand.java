@@ -3,8 +3,6 @@ package com.jpmc.command;
 import com.jpmc.di.DependencyInjection;
 import com.jpmc.service.BookingService;
 
-import java.util.UUID;
-
 public class BookCommand implements Command {
 
     private final String showNo;
@@ -24,8 +22,7 @@ public class BookCommand implements Command {
 
     @Override
     public String execute() {
-        UUID ticketId = bookingService.bookShow(this);
-        return ticketId.toString();
+        return bookingService.bookShow(this);
     }
 
     public String getShowNo() {

@@ -30,4 +30,12 @@ public class Seat {
     public String toString() {
         return row + "" + seatNo;
     }
+
+    public char getRow() {
+        return row;
+    }
+
+    public int getSeatNo() {
+        return seatNo;
+    }
 }

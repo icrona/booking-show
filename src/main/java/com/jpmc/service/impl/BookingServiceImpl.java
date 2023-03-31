@@ -14,10 +14,7 @@ import com.jpmc.exception.BusinessException;
 import com.jpmc.service.BookingService;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BookingServiceImpl implements BookingService {
@@ -39,13 +36,15 @@ public class BookingServiceImpl implements BookingService {
         Set<Seat> seats = availableSeatDAO.findByShowNo(command.getShowNo());
         return new AvailabilityDTO(
                 seats.stream()
+                        .sorted(Comparator.comparing(Seat::getRow)
+                                .thenComparing(Seat::getSeatNo))
                         .map(Seat::toString)
                         .collect(Collectors.toList())
         );
     }
 
     @Override
-    public UUID bookShow(BookCommand bookCommand) {
+    public String bookShow(BookCommand bookCommand) {
         String showNo = bookCommand.getShowNo();
         String phoneNo = bookCommand.getPhoneNo();
         if (showDAO.findByShowNo(showNo).isEmpty()) {
@@ -76,16 +75,17 @@ public class BookingServiceImpl implements BookingService {
         availableSeatDAO.removeAvailableSeats(showNo, seats);
 
         UUID ticketNo = UUID.randomUUID();
+        String ticketNoString = ticketNo.toString().replaceAll("-", "");
 
         Booking booking = new Booking(
                 showNo,
                 phoneNo,
-                ticketNo.toString(),
+                ticketNoString,
                 seats
         );
         bookingDAO.createOrUpdate(booking);
 
-        return ticketNo;
+        return ticketNoString;
     }
 
     @Override
@@ -108,7 +108,7 @@ public class BookingServiceImpl implements BookingService {
 
         int cancellationWindowInMinutes = show.getCancellationWindowInMinutes();
 
-        if (bookingToBeCancelled.getDateTime().plusMinutes(cancellationWindowInMinutes).isAfter(LocalDateTime.now())) {
+        if (LocalDateTime.now().isAfter(bookingToBeCancelled.getDateTime().plusMinutes(cancellationWindowInMinutes))) {
             throw new BusinessException(String.format(
                     "Exceeding Cancellation Window of %d minute(s), Unable to Cancel ticket", cancellationWindowInMinutes
             ));

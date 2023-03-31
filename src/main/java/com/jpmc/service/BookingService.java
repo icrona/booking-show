@@ -11,7 +11,7 @@ public interface BookingService extends Service {
 
     AvailabilityDTO findAvailability(FindAvailabilityCommand command);
 
-    UUID bookShow(BookCommand bookCommand);
+    String bookShow(BookCommand bookCommand);
 
     void cancelTicket(CancelCommand command);
 }
