@@ -4,8 +4,10 @@ import com.jpmc.dao.AvailableSeatDAO;
 import com.jpmc.dao.impl.AvailableSeatDAOImpl;
 import com.jpmc.dao.impl.BookingDAOImpl;
 import com.jpmc.dao.impl.ShowDAOImpl;
+import com.jpmc.service.BookingService;
 import com.jpmc.service.Service;
 import com.jpmc.service.ShowService;
+import com.jpmc.service.impl.BookingServiceImpl;
 import com.jpmc.service.impl.ShowServiceImpl;
 
 import java.util.List;
@@ -19,7 +21,9 @@ public class DependencyInjection {
 
     private static final ShowService showService = new ShowServiceImpl(showDAO, availableSeatDAO, bookingDAO);
 
-    private static final List<Service> SERVICES = List.of(showService);
+    private static final BookingService bookingService = new BookingServiceImpl(availableSeatDAO);
+
+    private static final List<Service> SERVICES = List.of(showService, bookingService);
 
     public static <T extends Service> T getService(Class<T> serviceClass) {
         return SERVICES.stream()
