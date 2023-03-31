@@ -1,9 +1,11 @@
 package com.jpmc.service;
 
 import com.jpmc.command.SetupCommand;
+import com.jpmc.command.ViewCommand;
 import com.jpmc.dao.AvailableSeatDAO;
 import com.jpmc.dao.BookingDAO;
 import com.jpmc.dao.ShowDAO;
+import com.jpmc.dao.entity.Booking;
 import com.jpmc.dao.entity.Seat;
 import com.jpmc.dao.entity.Show;
 import com.jpmc.dao.impl.ShowDAOImpl;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -133,5 +136,28 @@ class ShowServiceTest {
         Mockito.verify(availableSeatDAO, Mockito.times(1))
                 .addAvailableSeats(showNo, seats);
 
+    }
+
+    @Test
+    void testView_showNotFound_returnsEmpty() {
+        String notFoundShow = "1";
+
+        Mockito.when(showDAO.findByShowNo(notFoundShow))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertTrue(showService.view(new ViewCommand(notFoundShow)).isEmpty());
+    }
+
+    @Test
+    void testView() {
+        String showNo = "1";
+
+        Mockito.when(showDAO.findByShowNo(showNo))
+                .thenReturn(Optional.of(Mockito.mock(Show.class)));
+
+        Mockito.when(bookingDAO.findByShowNo(showNo))
+                        .thenReturn(List.of(Mockito.mock(Booking.class)));
+
+        Assertions.assertTrue(showService.view(new ViewCommand(showNo)).isPresent());
     }
 }
